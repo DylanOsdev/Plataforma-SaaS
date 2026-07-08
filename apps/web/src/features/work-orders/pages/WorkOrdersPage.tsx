@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import { DataTable, type Column } from '../../../shared/components/DataTable'
-import { useListWorkOrdersQuery, useCreateWorkOrderMutation } from '../workOrdersApi'
+import { useListWorkOrdersQuery } from '../workOrdersApi'
 import type { WorkOrder, ListWorkOrdersParams } from '../types'
 import { MILESTONE_LABELS, MILESTONE_COLORS } from '../milestone-config'
 import { WorkOrderFormDialog } from '../components/WorkOrderFormDialog'
