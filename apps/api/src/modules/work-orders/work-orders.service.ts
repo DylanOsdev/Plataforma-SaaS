@@ -12,6 +12,7 @@ import { UpdateWorkOrderDto } from './dto/update-work-order.dto';
 import { QueryWorkOrderDto } from './dto/query-work-order.dto';
 import { AssignMechanicsDto } from './dto/assign-mechanics.dto';
 import { TransitionMilestoneDto } from './dto/transition-milestone.dto';
+import { TimelineEntryDto } from './dto/timeline-entry.dto';
 import {
   WORK_ORDER_MILESTONES,
   isValidTransition,
@@ -480,6 +481,56 @@ export class WorkOrdersService {
           },
         },
       });
+    });
+  }
+
+  async getTimeline(
+    tenantId: string,
+    workOrderId: string,
+  ): Promise<TimelineEntryDto[]> {
+    return this.prisma.withRlsTransaction(async (tx) => {
+      const workOrder = await tx.workOrder.findFirst({
+        where: { id: workOrderId, tenantId },
+        select: { id: true },
+      });
+
+      if (!workOrder) {
+        throw new NotFoundException('Work order not found');
+      }
+
+      const auditLogs = await tx.auditLog.findMany({
+        where: {
+          resource: 'work_order',
+          resourceId: workOrderId,
+        },
+        orderBy: { createdAt: 'asc' },
+        select: {
+          id: true,
+          action: true,
+          details: true,
+          createdAt: true,
+          userId: true,
+        },
+      });
+
+      return auditLogs.map(
+        (log: {
+          id: string;
+          action: string;
+          details: unknown;
+          createdAt: Date;
+          userId: string;
+        }) => ({
+          id: log.id,
+          fromStatus:
+            (log.details as { fromStatus?: string })?.fromStatus ?? null,
+          toStatus:
+            (log.details as { toStatus?: string })?.toStatus ?? log.action,
+          actorName: 'System',
+          timestamp: log.createdAt,
+          action: log.action,
+        }),
+      );
     });
   }
 

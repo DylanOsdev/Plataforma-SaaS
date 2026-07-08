@@ -39,6 +39,9 @@ describe('WorkOrdersService', () => {
       delete: jest.fn(),
       count: jest.fn(),
     },
+    auditLog: {
+      findMany: jest.fn(),
+    },
   };
 
   const mockExecutionsService = {
@@ -354,6 +357,70 @@ describe('WorkOrdersService', () => {
           milestone: WORK_ORDER_MILESTONES.COMPLETED,
         }),
       ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('getTimeline', () => {
+    it('should return timeline entries mapped from audit logs', async () => {
+      const mockWorkOrder = { id: mockWorkOrderId };
+      const mockAuditLogs = [
+        {
+          id: 'log-1',
+          action: 'milestone_transition',
+          details: { fromStatus: 'created', toStatus: 'assigned' },
+          createdAt: new Date('2026-07-01T10:00:00Z'),
+          userId: 'user-1',
+        },
+        {
+          id: 'log-2',
+          action: 'milestone_transition',
+          details: { fromStatus: 'assigned', toStatus: 'in_progress' },
+          createdAt: new Date('2026-07-01T11:00:00Z'),
+          userId: 'user-1',
+        },
+      ];
+
+      mockTx.workOrder.findFirst.mockResolvedValue(mockWorkOrder);
+      mockTx.auditLog.findMany.mockResolvedValue(mockAuditLogs);
+
+      const result = await service.getTimeline(mockTenantId, mockWorkOrderId);
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({
+        id: 'log-1',
+        fromStatus: 'created',
+        toStatus: 'assigned',
+        actorName: 'System',
+        timestamp: mockAuditLogs[0].createdAt,
+        action: 'milestone_transition',
+      });
+      expect(result[1]).toEqual({
+        id: 'log-2',
+        fromStatus: 'assigned',
+        toStatus: 'in_progress',
+        actorName: 'System',
+        timestamp: mockAuditLogs[1].createdAt,
+        action: 'milestone_transition',
+      });
+    });
+
+    it('should return empty array when no audit logs exist', async () => {
+      const mockWorkOrder = { id: mockWorkOrderId };
+
+      mockTx.workOrder.findFirst.mockResolvedValue(mockWorkOrder);
+      mockTx.auditLog.findMany.mockResolvedValue([]);
+
+      const result = await service.getTimeline(mockTenantId, mockWorkOrderId);
+
+      expect(result).toEqual([]);
+    });
+
+    it('should throw NotFoundException if work order does not exist', async () => {
+      mockTx.workOrder.findFirst.mockResolvedValue(null);
+
+      await expect(
+        service.getTimeline(mockTenantId, mockWorkOrderId),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });
