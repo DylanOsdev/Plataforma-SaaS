@@ -5,6 +5,7 @@ import { SparePartsService } from './spare-parts.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
 describe('SparePartsService', () => {
+  let module: TestingModule;
   let service: SparePartsService;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let prisma: any;
@@ -42,8 +43,8 @@ describe('SparePartsService', () => {
     updatedAt: new Date(),
   };
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
       providers: [
         SparePartsService,
         {
@@ -66,6 +67,10 @@ describe('SparePartsService', () => {
 
     service = module.get<SparePartsService>(SparePartsService);
     prisma = module.get<PrismaService>(PrismaService);
+  });
+
+  afterAll(async () => {
+    await module.close();
   });
 
   describe('create', () => {

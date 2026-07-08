@@ -1,19 +1,24 @@
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { RolesGuard } from './roles.guard';
 
 describe('RolesGuard', () => {
+  let module: TestingModule;
   let guard: RolesGuard;
   let reflector: Reflector;
 
-  beforeEach(async () => {
-    const module = await Test.createTestingModule({
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
       providers: [RolesGuard, Reflector],
     }).compile();
 
     guard = module.get(RolesGuard);
     reflector = module.get(Reflector);
+  });
+
+  afterAll(async () => {
+    await module.close();
   });
 
   function createMockContext(role: string): ExecutionContext {

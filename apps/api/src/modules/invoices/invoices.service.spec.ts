@@ -9,6 +9,7 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { Decimal } from '@prisma/client/runtime/library';
 
 describe('InvoicesService', () => {
+  let module: TestingModule;
   let service: InvoicesService;
 
   const mockTenantId = '00000000-0000-0000-0000-000000000001';
@@ -33,10 +34,8 @@ describe('InvoicesService', () => {
     },
   };
 
-  beforeEach(async () => {
-    jest.resetAllMocks();
-
-    const module: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
       providers: [
         InvoicesService,
         {
@@ -49,6 +48,18 @@ describe('InvoicesService', () => {
     }).compile();
 
     service = module.get<InvoicesService>(InvoicesService);
+  });
+
+  afterAll(async () => {
+    await module.close();
+  });
+
+  beforeEach(() => {
+    for (const group of Object.values(mockTx)) {
+      for (const fn of Object.values(group)) {
+        if (jest.isMockFunction(fn)) fn.mockReset();
+      }
+    }
   });
 
   describe('createInvoice', () => {

@@ -4,6 +4,7 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { Decimal } from '@prisma/client/runtime/library';
 
 describe('ReportsService', () => {
+  let module: TestingModule;
   let service: ReportsService;
   let prisma: PrismaService;
 
@@ -36,8 +37,8 @@ describe('ReportsService', () => {
     },
   };
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
       providers: [
         ReportsService,
         {
@@ -54,8 +55,16 @@ describe('ReportsService', () => {
     prisma = module.get<PrismaService>(PrismaService);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
+  afterAll(async () => {
+    await module.close();
+  });
+
+  beforeEach(() => {
+    for (const group of Object.values(mockTx)) {
+      for (const fn of Object.values(group)) {
+        if (jest.isMockFunction(fn)) fn.mockReset();
+      }
+    }
   });
 
   describe('getDashboardMetrics', () => {
