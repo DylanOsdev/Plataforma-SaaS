@@ -19,6 +19,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard'
 import PeopleIcon from '@mui/icons-material/People'
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar'
 import BuildIcon from '@mui/icons-material/Build'
+import BuildCircleIcon from '@mui/icons-material/BuildCircle'
 import InventoryIcon from '@mui/icons-material/Inventory'
 import { useAppSelector, useAppDispatch } from '../store/hooks'
 import { logout } from '../features/auth/slices/authSlice'
@@ -36,6 +37,7 @@ const navItems: NavItem[] = [
   { label: 'Clients', path: '/clients', icon: <PeopleIcon /> },
   { label: 'Vehicles', path: '/vehicles', icon: <DirectionsCarIcon /> },
   { label: 'Mechanics', path: '/mechanics', icon: <BuildIcon /> },
+  { label: 'Work Orders', path: '/work-orders', icon: <BuildCircleIcon /> },
   { label: 'Inventory', path: '/inventory', icon: <InventoryIcon /> },
 ]
 
