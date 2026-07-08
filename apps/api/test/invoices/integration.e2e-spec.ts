@@ -116,7 +116,7 @@ describe('Invoice Integration Flow (e2e)', () => {
       const woAfterInvoice = await seedPrisma.workOrder.findUnique({
         where: { id: workOrder.id },
       });
-      expect(woAfterInvoice.milestone).toBe('invoiced');
+      expect(woAfterInvoice!.milestone).toBe('invoiced');
 
       // 3. Register partial payment
       const payment1Response = await request(app.getHttpServer())
@@ -150,7 +150,7 @@ describe('Invoice Integration Flow (e2e)', () => {
       const woAfterPayment = await seedPrisma.workOrder.findUnique({
         where: { id: workOrder.id },
       });
-      expect(woAfterPayment.milestone).toBe('paid');
+      expect(woAfterPayment!.milestone).toBe('paid');
 
       // 5. Verify invoice has all payments
       const invoiceDetail = await request(app.getHttpServer())
@@ -217,7 +217,7 @@ describe('Invoice Integration Flow (e2e)', () => {
       const woAfterCancel = await seedPrisma.workOrder.findUnique({
         where: { id: workOrder.id },
       });
-      expect(woAfterCancel.milestone).toBe('completed');
+      expect(woAfterCancel!.milestone).toBe('completed');
     });
   });
 

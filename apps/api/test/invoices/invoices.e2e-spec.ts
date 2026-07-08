@@ -116,7 +116,7 @@ describe('InvoicesController (e2e)', () => {
       const updatedWorkOrder = await seedPrisma.workOrder.findUnique({
         where: { id: workOrder.id },
       });
-      expect(updatedWorkOrder.milestone).toBe('invoiced');
+      expect(updatedWorkOrder!.milestone).toBe('invoiced');
     });
 
     it('should reject if work order not found', async () => {
@@ -379,7 +379,7 @@ describe('InvoicesController (e2e)', () => {
       const updatedWorkOrder = await seedPrisma.workOrder.findUnique({
         where: { id: workOrder.id },
       });
-      expect(updatedWorkOrder.milestone).toBe('paid');
+      expect(updatedWorkOrder!.milestone).toBe('paid');
     });
 
     it('should register an overpayment', async () => {
@@ -492,7 +492,7 @@ describe('InvoicesController (e2e)', () => {
       const updatedWorkOrder = await seedPrisma.workOrder.findUnique({
         where: { id: workOrder.id },
       });
-      expect(updatedWorkOrder.milestone).toBe('completed');
+      expect(updatedWorkOrder!.milestone).toBe('completed');
     });
 
     it('should cancel a partial invoice and delete payments', async () => {

@@ -7,7 +7,7 @@ export interface SeedInvoiceResult {
   workOrderId: string;
   clientId: string;
   invoiceNumber: string;
-  status: string;
+  status: 'pending' | 'partial' | 'paid' | 'overpaid' | 'cancelled';
 }
 
 export interface SeedInvoiceOpts {
@@ -15,7 +15,7 @@ export interface SeedInvoiceOpts {
   workOrderId: string;
   clientId: string;
   invoiceNumber?: string;
-  status?: string;
+  status?: 'pending' | 'partial' | 'paid' | 'overpaid' | 'cancelled';
   subtotal?: number;
   taxRate?: number;
   taxAmount?: number;
