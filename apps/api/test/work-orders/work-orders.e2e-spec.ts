@@ -243,6 +243,54 @@ describe('WorkOrdersController (e2e)', () => {
     });
   });
 
+  describe('GET /work-orders/:id/timeline', () => {
+    it('should return timeline entries for a work order', async () => {
+      const { accessToken, tenantId } =
+        await seedActiveUserWithTenant(seedPrisma);
+      const client = await seedClient(seedPrisma, { tenantId });
+      const vehicle = await seedVehicle(seedPrisma, {
+        tenantId,
+        clientId: client.id,
+      });
+      const workOrder = await seedWorkOrder(seedPrisma, {
+        tenantId,
+        vehicleId: vehicle.id,
+        clientId: client.id,
+      });
+
+      // First assign a mechanic to trigger a milestone transition + audit log
+      const mechanic = await seedMechanic(seedPrisma, { tenantId });
+      await request(app.getHttpServer())
+        .post(`/work-orders/${workOrder.id}/mechanics`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ mechanicIds: [mechanic.id], primaryMechanicId: mechanic.id })
+        .expect(201);
+
+      const response = await request(app.getHttpServer())
+        .get(`/work-orders/${workOrder.id}/timeline`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThanOrEqual(1);
+
+      const entry = response.body[0];
+      expect(entry.id).toBeDefined();
+      expect(entry.fromStatus).toBeDefined();
+      expect(entry.toStatus).toBeDefined();
+      expect(entry.timestamp).toBeDefined();
+    });
+
+    it('should return 404 for non-existent work order', async () => {
+      const { accessToken } = await seedActiveUserWithTenant(seedPrisma);
+
+      await request(app.getHttpServer())
+        .get(`/work-orders/00000000-0000-0000-0000-000000000000/timeline`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(404);
+    });
+  });
+
   // TODO: Fix RBAC tests - throttle limit (5 requests per 60s) causes failures
   // These tests need to be refactored to work within throttle constraints
   // or use a separate test suite with higher throttle limits
