@@ -100,7 +100,6 @@ export default function WorkOrdersPage({ initialParams }: WorkOrdersPageProps) {
   if (dateTo) params.dateTo = dateTo
 
   const { data, isLoading, isError, error } = useListWorkOrdersQuery(params)
-  const [createWorkOrder] = useCreateWorkOrderMutation()
 
   const handlePageChange = useCallback((newPage: number) => {
     setPage(newPage)

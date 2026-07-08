@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, waitFor, within } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithProviders } from '../../../test/renderWithProviders'
 
@@ -19,7 +19,7 @@ vi.mock('../workOrdersApi', () => ({
 }))
 
 import WorkOrdersPage from '../pages/WorkOrdersPage'
-import { MILESTONE_LABELS, MILESTONE_COLORS } from '../milestone-config'
+import { MILESTONE_LABELS } from '../milestone-config'
 
 const sampleWorkOrders = [
   {
