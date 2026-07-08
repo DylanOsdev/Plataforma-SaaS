@@ -1,7 +1,7 @@
 import { api } from '../../lib/http/api'
 import type { PaginatedResponse } from '../../shared/types/api'
 import type { WorkOrder, TimelineEntry, ListWorkOrdersParams } from './types'
-import type { CreateWorkOrderPayload, AddPartPayload } from './validation'
+import type { CreateWorkOrderPayload } from './validation'
 
 export const workOrdersApi = api.injectEndpoints({
   endpoints: (builder) => ({
