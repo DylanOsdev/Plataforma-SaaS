@@ -24,7 +24,6 @@ import {
   seedWorkOrder,
   truncateWorkOrdersTable,
 } from '../helpers/work-order-seed.helper';
-import { v4 as uuidv4 } from 'uuid';
 
 describe('WorkOrdersController (e2e)', () => {
   let app: INestApplication;
@@ -262,7 +261,7 @@ describe('WorkOrdersController (e2e)', () => {
       // Seed an audit log entry directly (assignMechanics may not log automatically)
       await seedPrisma.auditLog.create({
         data: {
-          id: uuidv4(),
+          id: crypto.randomUUID(),
           tenantId,
           userId: 'system',
           resource: 'work_order',
