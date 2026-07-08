@@ -496,7 +496,7 @@ describe('InvoicesController (e2e)', () => {
     });
 
     it('should cancel a partial invoice and delete payments', async () => {
-      const { accessToken, tenantId } =
+      const { accessToken, tenantId, userId } =
         await seedActiveUserWithTenant(seedPrisma);
       const client = await seedClient(seedPrisma, { tenantId });
       const vehicle = await seedVehicle(seedPrisma, {
@@ -525,7 +525,7 @@ describe('InvoicesController (e2e)', () => {
           invoiceId: invoice.id,
           amount: 500,
           method: 'cash',
-          receivedBy: accessToken.split('.')[0], // Just a placeholder
+          receivedBy: userId,
         },
       });
 

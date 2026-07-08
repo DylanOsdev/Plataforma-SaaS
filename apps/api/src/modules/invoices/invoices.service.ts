@@ -30,20 +30,21 @@ export class InvoicesService {
         throw new NotFoundException('WorkOrder not found');
       }
 
-      // 2. Validate WorkOrder status
-      if (workOrder.milestone !== 'completed') {
-        throw new BadRequestException(
-          'WorkOrder must be in completed state to create invoice',
-        );
-      }
-
-      // 3. Check no existing invoice
+      // 2. Check no existing invoice (check BEFORE milestone validation
+      //    so a duplicate returns ConflictException, not BadRequestException)
       const existing = await tx.invoice.findFirst({
         where: { workOrderId, tenantId },
       });
       if (existing) {
         throw new ConflictException(
           'Invoice already exists for this WorkOrder',
+        );
+      }
+
+      // 3. Validate WorkOrder status
+      if (workOrder.milestone !== 'completed') {
+        throw new BadRequestException(
+          'WorkOrder must be in completed state to create invoice',
         );
       }
 
