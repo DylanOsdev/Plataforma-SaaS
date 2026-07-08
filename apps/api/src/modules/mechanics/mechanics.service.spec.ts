@@ -4,6 +4,7 @@ import { MechanicsService } from './mechanics.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
 describe('MechanicsService', () => {
+  let module: TestingModule;
   let service: MechanicsService;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let prisma: any;
@@ -35,8 +36,8 @@ describe('MechanicsService', () => {
     updatedAt: new Date(),
   };
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
       providers: [
         MechanicsService,
         {
@@ -305,5 +306,9 @@ describe('MechanicsService', () => {
         service.remove(mockTenantId, mockMechanicId),
       ).rejects.toThrow(NotFoundException);
     });
+  });
+
+  afterAll(async () => {
+    await module.close();
   });
 });

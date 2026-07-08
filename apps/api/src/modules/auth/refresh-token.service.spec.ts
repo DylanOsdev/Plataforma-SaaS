@@ -1,10 +1,11 @@
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { RefreshTokenService } from './refresh-token.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
 
 describe('RefreshTokenService', () => {
+  let module: TestingModule;
   let service: RefreshTokenService;
 
   const mockPrisma = {
@@ -22,8 +23,8 @@ describe('RefreshTokenService', () => {
     signAsync: jest.fn().mockResolvedValue('new-access-token'),
   };
 
-  beforeEach(async () => {
-    const module = await Test.createTestingModule({
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
       providers: [
         RefreshTokenService,
         { provide: PrismaService, useValue: mockPrisma },
@@ -32,6 +33,13 @@ describe('RefreshTokenService', () => {
     }).compile();
 
     service = module.get(RefreshTokenService);
+  });
+
+  afterAll(async () => {
+    await module.close();
+  });
+
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 

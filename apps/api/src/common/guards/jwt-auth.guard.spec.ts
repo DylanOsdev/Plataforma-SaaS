@@ -1,19 +1,24 @@
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 describe('JwtAuthGuard', () => {
+  let module: TestingModule;
   let guard: JwtAuthGuard;
   let reflector: Reflector;
 
-  beforeEach(async () => {
-    const module = await Test.createTestingModule({
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
       providers: [JwtAuthGuard, Reflector],
     }).compile();
 
     guard = module.get(JwtAuthGuard);
     reflector = module.get(Reflector);
+  });
+
+  afterAll(async () => {
+    await module.close();
   });
 
   function createMockContext(): ExecutionContext {

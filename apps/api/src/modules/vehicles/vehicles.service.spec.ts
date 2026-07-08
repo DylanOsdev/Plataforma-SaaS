@@ -4,6 +4,7 @@ import { VehiclesService } from './vehicles.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
 describe('VehiclesService', () => {
+  let module: TestingModule;
   let service: VehiclesService;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let prisma: any;
@@ -49,8 +50,8 @@ describe('VehiclesService', () => {
     },
   };
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
       providers: [
         VehiclesService,
         {
@@ -67,6 +68,10 @@ describe('VehiclesService', () => {
 
     service = module.get<VehiclesService>(VehiclesService);
     prisma = module.get<PrismaService>(PrismaService);
+  });
+
+  afterAll(async () => {
+    await module.close();
   });
 
   describe('create', () => {

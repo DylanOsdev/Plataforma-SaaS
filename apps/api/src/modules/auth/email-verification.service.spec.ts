@@ -1,9 +1,10 @@
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { EmailVerificationService } from './email-verification.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
 describe('EmailVerificationService', () => {
+  let module: TestingModule;
   let service: EmailVerificationService;
 
   const mockPrisma = {
@@ -13,8 +14,8 @@ describe('EmailVerificationService', () => {
     $transaction: jest.fn(),
   };
 
-  beforeEach(async () => {
-    const module = await Test.createTestingModule({
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
       providers: [
         EmailVerificationService,
         { provide: PrismaService, useValue: mockPrisma },
@@ -22,6 +23,13 @@ describe('EmailVerificationService', () => {
     }).compile();
 
     service = module.get(EmailVerificationService);
+  });
+
+  afterAll(async () => {
+    await module.close();
+  });
+
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 

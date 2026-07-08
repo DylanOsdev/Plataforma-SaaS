@@ -1,4 +1,4 @@
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { RefreshTokenService } from './refresh-token.service';
@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 
 describe('AuthService', () => {
+  let module: TestingModule;
   let service: AuthService;
 
   const mockPrisma = {
@@ -27,8 +28,8 @@ describe('AuthService', () => {
       .mockResolvedValue({ refreshToken: 'refresh-tok', familyId: 'fam-1' }),
   };
 
-  beforeEach(async () => {
-    const module = await Test.createTestingModule({
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: PrismaService, useValue: mockPrisma },
@@ -39,6 +40,13 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get(AuthService);
+  });
+
+  afterAll(async () => {
+    await module.close();
+  });
+
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 

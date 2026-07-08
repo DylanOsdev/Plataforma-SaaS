@@ -5,6 +5,7 @@ import { PrismaService } from '../../common/prisma';
 import { Decimal } from '@prisma/client/runtime/library';
 
 describe('PaymentsService', () => {
+  let module: TestingModule;
   let service: PaymentsService;
 
   const mockTenantId = '00000000-0000-0000-0000-000000000001';
@@ -26,10 +27,8 @@ describe('PaymentsService', () => {
     },
   };
 
-  beforeEach(async () => {
-    jest.resetAllMocks();
-
-    const module: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
       providers: [
         PaymentsService,
         {
@@ -42,6 +41,18 @@ describe('PaymentsService', () => {
     }).compile();
 
     service = module.get<PaymentsService>(PaymentsService);
+  });
+
+  afterAll(async () => {
+    await module.close();
+  });
+
+  beforeEach(() => {
+    for (const group of Object.values(mockTx)) {
+      for (const fn of Object.values(group)) {
+        if (jest.isMockFunction(fn)) fn.mockReset();
+      }
+    }
   });
 
   describe('registerPayment', () => {

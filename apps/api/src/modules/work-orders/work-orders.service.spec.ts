@@ -6,6 +6,7 @@ import { ExecutionsService } from '../checklists/executions.service';
 import { WORK_ORDER_MILESTONES } from './constants/work-order-milestones';
 
 describe('WorkOrdersService', () => {
+  let module: TestingModule;
   let service: WorkOrdersService;
 
   const mockTenantId = '00000000-0000-0000-0000-000000000001';
@@ -44,10 +45,8 @@ describe('WorkOrdersService', () => {
     validateChecklistsForCompletion: jest.fn(),
   };
 
-  beforeEach(async () => {
-    jest.resetAllMocks();
-
-    const module: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
       providers: [
         WorkOrdersService,
         {
@@ -64,6 +63,21 @@ describe('WorkOrdersService', () => {
     }).compile();
 
     service = module.get<WorkOrdersService>(WorkOrdersService);
+  });
+
+  afterAll(async () => {
+    await module.close();
+  });
+
+  beforeEach(() => {
+    for (const group of Object.values(mockTx)) {
+      for (const fn of Object.values(group)) {
+        if (jest.isMockFunction(fn)) fn.mockReset();
+      }
+    }
+    for (const fn of Object.values(mockExecutionsService)) {
+      if (jest.isMockFunction(fn)) fn.mockReset();
+    }
   });
 
   describe('create', () => {
