@@ -259,9 +259,10 @@ describe('WorkOrdersController (e2e)', () => {
       });
 
       // Seed an audit log entry directly (assignMechanics may not log automatically)
+      const auditLogId = '00000000-0000-0000-0000-000000000001'
       await seedPrisma.auditLog.create({
         data: {
-          id: crypto.randomUUID(),
+          id: auditLogId,
           tenantId,
           userId: 'system',
           resource: 'work_order',
