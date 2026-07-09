@@ -15,6 +15,7 @@ const ClientsPage = lazy(() => import('../features/clients/pages/ClientsPage'))
 const VehiclesPage = lazy(() => import('../features/vehicles/pages/VehiclesPage'))
 const MechanicsPage = lazy(() => import('../features/mechanics/pages/MechanicsPage'))
 const SparePartsPage = lazy(() => import('../features/spare-parts/pages/SparePartsPage'))
+const WorkOrdersPage = lazy(() => import('../features/work-orders/pages/WorkOrdersPage'))
 
 function LoadingFallback() {
   return (
@@ -84,6 +85,14 @@ export function AppRouter() {
           element={
             <Suspense fallback={<LoadingFallback />}>
               <SparePartsPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/work-orders"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <WorkOrdersPage />
             </Suspense>
           }
         />
