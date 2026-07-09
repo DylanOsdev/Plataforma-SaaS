@@ -245,7 +245,7 @@ describe('WorkOrdersController (e2e)', () => {
 
   describe('GET /work-orders/:id/timeline', () => {
     it('should return timeline entries for a work order', async () => {
-      const { accessToken, tenantId } =
+      const { accessToken, tenantId, userId } =
         await seedActiveUserWithTenant(seedPrisma);
       const client = await seedClient(seedPrisma, { tenantId });
       const vehicle = await seedVehicle(seedPrisma, {
@@ -259,12 +259,10 @@ describe('WorkOrdersController (e2e)', () => {
       });
 
       // Seed an audit log entry directly (assignMechanics may not log automatically)
-      const auditLogId = '00000000-0000-0000-0000-000000000001';
       await seedPrisma.auditLog.create({
         data: {
-          id: auditLogId,
           tenantId,
-          userId: 'system',
+          userId,
           resource: 'work_order',
           resourceId: workOrder.id,
           action: 'milestone_transition',
