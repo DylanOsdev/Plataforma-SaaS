@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -82,7 +82,7 @@ export function WorkOrderFormDialog({
       vehicleId: '',
       description: '',
       mechanicId: undefined,
-      priority: '',
+      priority: undefined,
     },
   })
 
@@ -135,43 +135,40 @@ export function WorkOrderFormDialog({
       })
   }, [selectedClientId, setValue, initialVehicles])
 
-  const onSubmit = useCallback(
-    async (data: CreateWorkOrderPayload) => {
-      setServerError(null)
-      setFieldErrors({})
-      try {
-        await createWorkOrder(data).unwrap()
-        onSuccess()
-      } catch (err: unknown) {
-        const apiError = err as { status?: number; data?: ApiErrorResponse }
-        if (apiError?.status === 422 && apiError?.data) {
-          const messages = apiError.data.message
-          if (Array.isArray(messages)) {
-            const fieldErrMap: Record<string, string> = {}
-            messages.forEach((msg: string) => {
-              const [field, ...rest] = msg.split(' ')
-              if (field) fieldErrMap[field.toLowerCase()] = rest.join(' ') || msg
-            })
-            if (Object.keys(fieldErrMap).length > 0) {
-              setFieldErrors(fieldErrMap)
-            }
+  const handleFormSubmit = handleSubmit(async (data: CreateWorkOrderPayload) => {
+    setServerError(null)
+    setFieldErrors({})
+    try {
+      await createWorkOrder(data).unwrap()
+      onSuccess()
+    } catch (err: unknown) {
+      const apiError = err as { status?: number; data?: ApiErrorResponse }
+      if (apiError?.status === 422 && apiError?.data) {
+        const messages = apiError.data.message
+        if (Array.isArray(messages)) {
+          const fieldErrMap: Record<string, string> = {}
+          messages.forEach((msg: string) => {
+            const [field, ...rest] = msg.split(' ')
+            if (field) fieldErrMap[field.toLowerCase()] = rest.join(' ') || msg
+          })
+          if (Object.keys(fieldErrMap).length > 0) {
+            setFieldErrors(fieldErrMap)
           }
-          setServerError(
-            Array.isArray(apiError.data.message)
-              ? apiError.data.message.join(', ')
-              : apiError.data.message,
-          )
-        } else {
-          setServerError('Something went wrong. Please try again.')
         }
+        setServerError(
+          Array.isArray(apiError.data.message)
+            ? apiError.data.message.join(', ')
+            : apiError.data.message,
+        )
+      } else {
+        setServerError('Something went wrong. Please try again.')
       }
-    },
-    [createWorkOrder, onSuccess],
-  )
+    }
+  })
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <form onSubmit={handleFormSubmit} noValidate>
         <DialogTitle>Create Work Order</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
