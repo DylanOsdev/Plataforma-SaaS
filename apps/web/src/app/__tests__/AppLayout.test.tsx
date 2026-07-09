@@ -24,6 +24,8 @@ const mockUser = {
   id: 'user-1',
   email: 'test@motogest.com',
   fullName: 'Test User',
+  role: 'admin_taller',
+  tenantId: 'tenant-1',
 }
 
 function renderLayout(initialEntries = ['/']) {

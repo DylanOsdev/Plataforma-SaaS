@@ -136,7 +136,7 @@ describe('VehiclesPage', () => {
 
     await waitFor(() => {
       const calls = mockUseListVehiclesQuery.mock.calls
-      const page2Call = calls.find(([args]: [Record<string, unknown>]) => args.page === 2)
+      const page2Call = calls.find((call) => (call[0] as Record<string, unknown>)?.page === 2)
       expect(page2Call).toBeDefined()
     }, { timeout: 3000 })
   })
