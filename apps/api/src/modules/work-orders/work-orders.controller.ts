@@ -7,6 +7,9 @@ import {
   Param,
   Delete,
   Query,
+  HttpCode,
+  HttpStatus,
+  ParseUUIDPipe,
   UseInterceptors,
   NotFoundException,
 } from '@nestjs/common';
@@ -19,6 +22,7 @@ import { QueryWorkOrderDto } from './dto/query-work-order.dto';
 import { AssignMechanicsDto } from './dto/assign-mechanics.dto';
 import { TransitionMilestoneDto } from './dto/transition-milestone.dto';
 import { AddPartDto } from './dto/add-part.dto';
+import { TimelineEntryDto } from './dto/timeline-entry.dto';
 import { TenantContextInterceptor } from '../../common/tenant/tenant-context.interceptor';
 import { TenantContext } from '../../common/tenant/tenant-context.service';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -227,6 +231,15 @@ export class WorkOrdersController {
     }
 
     return this.partsService.listParts(this.tenantContext.tenantId, id);
+  }
+
+  @Get(':id/timeline')
+  @HttpCode(HttpStatus.OK)
+  @Roles('admin_taller', 'recepcionista', 'mecanico')
+  async getTimeline(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<TimelineEntryDto[]> {
+    return this.workOrdersService.getTimeline(this.tenantContext.tenantId, id);
   }
 
   @Get(':id/costs')
