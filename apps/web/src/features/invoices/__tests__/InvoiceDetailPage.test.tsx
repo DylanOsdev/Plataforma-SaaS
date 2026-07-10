@@ -140,7 +140,7 @@ describe('InvoiceDetailPage', () => {
     expect(screen.getByText(dateStr)).toBeInTheDocument();
   });
 
-  it('should render PDF preview placeholder', () => {
+  it('should render PDF preview with download button', () => {
     mockUseGetInvoiceQuery.mockReturnValue({
       data: sampleInvoice,
       isLoading: false,
@@ -150,8 +150,9 @@ describe('InvoiceDetailPage', () => {
 
     renderDetailPage();
 
-    expect(screen.getByText('PDF preview not yet available')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /download pdf/i })).toBeInTheDocument();
+    const downloadBtn = screen.getByRole('button', { name: /descargar pdf/i });
+    expect(downloadBtn).toBeInTheDocument();
+    expect(downloadBtn).not.toBeDisabled();
   });
 
   it('should navigate back to invoices list on back button click', async () => {
