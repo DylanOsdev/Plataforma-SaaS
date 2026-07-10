@@ -26,6 +26,26 @@ export interface Payment {
   paymentDate: string;
 }
 
+export type CreditNoteType = 'credit' | 'debit';
+export type CreditNoteStatus = 'active' | 'cancelled';
+
+export interface CreditNote {
+  id: string;
+  invoiceId: string;
+  type: CreditNoteType;
+  amount: number;
+  reason: string;
+  status: CreditNoteStatus;
+  number: string;
+  issueDate: string;
+}
+
+export interface CreateCreditNoteDto {
+  type: CreditNoteType;
+  amount: number;
+  reason: string;
+}
+
 export interface ListInvoicesParams {
   status?: InvoiceStatus;
   clientId?: string;

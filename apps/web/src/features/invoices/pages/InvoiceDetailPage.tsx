@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useGetInvoiceQuery } from '../invoicesApi';
+import CreditNotesSection from '../components/CreditNotesSection';
 import InvoicePdfPreview from '../components/InvoicePdfPreview';
 import type { InvoiceStatus } from '../types';
 
@@ -163,6 +164,8 @@ export default function InvoiceDetailPage() {
           </TableContainer>
         </Paper>
       )}
+
+      <CreditNotesSection invoiceId={invoice.id} />
 
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
