@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerStorageService } from '@nestjs/throttler';
 import * as request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
@@ -45,8 +45,10 @@ describe('Invoice PDF Generation (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      .overrideProvider(ThrottlerGuard)
-      .useValue({ canActivate: () => true })
+      .overrideProvider(ThrottlerStorageService)
+      .useValue({
+        increment: async () => ({ totalHits: 0, timeToExpire: 60000 }),
+      })
       .compile();
 
     app = moduleFixture.createNestApplication();
