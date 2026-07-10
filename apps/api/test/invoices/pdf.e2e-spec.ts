@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { ThrottlerGuard, ThrottlerStorageService } from '@nestjs/throttler';
+import { ThrottlerStorageService } from '@nestjs/throttler';
 import * as request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
