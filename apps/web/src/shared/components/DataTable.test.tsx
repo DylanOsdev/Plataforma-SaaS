@@ -21,6 +21,52 @@ const testData: TestRow[] = [
 ]
 
 describe('DataTable', () => {
+  it('should call onRowClick when a row is clicked and handler is provided', async () => {
+    const user = userEvent.setup()
+    const onRowClick = vi.fn()
+
+    renderWithProviders(
+      <DataTable
+        columns={columns}
+        data={testData}
+        totalCount={2}
+        page={0}
+        rowsPerPage={10}
+        onPageChange={vi.fn()}
+        onRowsPerPageChange={vi.fn()}
+        onRowClick={onRowClick}
+        getRowId={(row) => row.id}
+      />,
+    )
+
+    const row1 = screen.getByText('Item 1').closest('tr')
+    expect(row1).not.toBeNull()
+    await user.click(row1!)
+
+    expect(onRowClick).toHaveBeenCalledTimes(1)
+    expect(onRowClick).toHaveBeenCalledWith(testData[0])
+  })
+
+  it('should not throw when no onRowClick is provided', async () => {
+    const user = userEvent.setup()
+
+    renderWithProviders(
+      <DataTable
+        columns={columns}
+        data={testData}
+        totalCount={2}
+        page={0}
+        rowsPerPage={10}
+        onPageChange={vi.fn()}
+        onRowsPerPageChange={vi.fn()}
+      />,
+    )
+
+    const row1 = screen.getByText('Item 1').closest('tr')
+    expect(row1).not.toBeNull()
+    // Should not throw when clicking without onRowClick
+    await expect(user.click(row1!)).resolves.toBeUndefined()
+  })
   it('should render data rows', () => {
     renderWithProviders(
       <DataTable

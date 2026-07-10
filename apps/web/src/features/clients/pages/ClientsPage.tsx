@@ -1,5 +1,114 @@
-import { Typography } from '@mui/material'
+import { useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import {
+  Box,
+  Stack,
+  Typography,
+  Chip,
+  Alert,
+} from '@mui/material'
+import { DataTable, type Column } from '../../../shared/components/DataTable'
+import { SearchBar } from '../../../shared/components/SearchBar'
+import { useListClientsQuery } from '../clientsApi'
+import type { Client, ListClientsParams } from '../types'
 
-export default function ClientsPage() {
-  return <Typography variant="h4">Clients</Typography>
+const columns: Column<Client>[] = [
+  {
+    id: 'name',
+    label: 'Name',
+    render: (row) => row.name,
+    sortable: true,
+  },
+  {
+    id: 'email',
+    label: 'Email',
+    render: (row) => row.email,
+    sortable: true,
+  },
+  {
+    id: 'phone',
+    label: 'Phone',
+    render: (row) => row.phone,
+  },
+  {
+    id: 'status',
+    label: 'Status',
+    render: (row) => <Chip label={row.status} color={row.status === 'active' ? 'success' : 'default'} size="small" />,
+    sortable: true,
+  },
+  {
+    id: 'createdAt',
+    label: 'Created',
+    render: (row) => new Date(row.createdAt).toLocaleDateString(),
+    sortable: true,
+  },
+]
+
+export type ClientsPageProps = {
+  initialParams?: Partial<ListClientsParams>
+}
+
+export default function ClientsPage({ initialParams }: ClientsPageProps) {
+  const navigate = useNavigate()
+  const [page, setPage] = useState(initialParams?.page ?? 0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [search, setSearch] = useState('')
+
+  const params: ListClientsParams = {
+    page: page + 1,
+    limit: rowsPerPage,
+  }
+  if (search) params.search = search
+
+  const { data, isLoading, isError, error } = useListClientsQuery(params)
+
+  const handlePageChange = useCallback((newPage: number) => {
+    setPage(newPage)
+  }, [])
+
+  const handleRowsPerPageChange = useCallback((newRowsPerPage: number) => {
+    setRowsPerPage(newRowsPerPage)
+    setPage(0)
+  }, [])
+
+  const handleSearch = useCallback((value: string) => {
+    setSearch(value)
+    setPage(0)
+  }, [])
+
+  return (
+    <Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h4">Clients</Typography>
+      </Box>
+
+      <Stack direction="row" spacing={2} mb={2}>
+        <SearchBar
+          value={search}
+          onSearch={handleSearch}
+          placeholder="Search clients..."
+        />
+      </Stack>
+
+      {isError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          Failed to load clients. {(error as { data?: { message?: string } })?.data?.message ?? 'Please try again.'}
+        </Alert>
+      )}
+
+      <DataTable
+        columns={columns}
+        data={data?.data ?? []}
+        totalCount={data?.meta?.total ?? 0}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handleRowsPerPageChange}
+        isLoading={isLoading}
+        emptyMessage="No clients yet"
+        getRowId={(row) => row.id}
+        onRowClick={(row) => navigate(`/clients/${row.id}`)}
+      />
+    </Box>
+  )
 }

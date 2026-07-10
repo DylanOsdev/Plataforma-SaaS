@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import type React from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import {
   AppBar,
+  Badge,
   Box,
   Drawer,
   IconButton,
@@ -21,8 +23,10 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar'
 import BuildIcon from '@mui/icons-material/Build'
 import BuildCircleIcon from '@mui/icons-material/BuildCircle'
 import InventoryIcon from '@mui/icons-material/Inventory'
+import ReceiptIcon from '@mui/icons-material/Receipt'
 import { useAppSelector, useAppDispatch } from '../store/hooks'
 import { logout } from '../features/auth/slices/authSlice'
+import { useGetLowStockCountQuery } from '../features/spare-parts/sparePartsApi'
 
 const DRAWER_WIDTH = 240
 
@@ -32,21 +36,25 @@ interface NavItem {
   icon: React.ReactNode
 }
 
-const navItems: NavItem[] = [
-  { label: 'Dashboard', path: '/', icon: <DashboardIcon /> },
-  { label: 'Clients', path: '/clients', icon: <PeopleIcon /> },
-  { label: 'Vehicles', path: '/vehicles', icon: <DirectionsCarIcon /> },
-  { label: 'Mechanics', path: '/mechanics', icon: <BuildIcon /> },
-  { label: 'Work Orders', path: '/work-orders', icon: <BuildCircleIcon /> },
-  { label: 'Inventory', path: '/inventory', icon: <InventoryIcon /> },
-]
-
-export function AppLayout() {
+export function AppLayout(): React.JSX.Element {
   const [mobileOpen, setMobileOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useAppDispatch()
   const user = useAppSelector((s) => s.auth.user)
+  const { data: lowStockCount = 0 } = useGetLowStockCountQuery(undefined, {
+    pollingInterval: 30000,
+  })
+
+  const navItems: NavItem[] = [
+    { label: 'Dashboard', path: '/', icon: <DashboardIcon /> },
+    { label: 'Clients', path: '/clients', icon: <PeopleIcon /> },
+    { label: 'Vehicles', path: '/vehicles', icon: <DirectionsCarIcon /> },
+    { label: 'Mechanics', path: '/mechanics', icon: <BuildIcon /> },
+    { label: 'Work Orders', path: '/work-orders', icon: <BuildCircleIcon /> },
+    { label: 'Invoices', path: '/invoices', icon: <ReceiptIcon /> },
+    { label: 'Inventory', path: '/inventory', icon: <Badge badgeContent={lowStockCount} color="error"><InventoryIcon /></Badge> },
+  ]
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)

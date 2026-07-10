@@ -1,3 +1,4 @@
+import type React from 'react'
 import {
   Table,
   TableBody,
@@ -34,6 +35,7 @@ export interface DataTableProps<T> {
   isLoading?: boolean
   getRowId?: (row: T) => string | number
   renderActions?: (row: T) => React.ReactNode
+  onRowClick?: (row: T) => void
   emptyMessage?: string
 }
 
@@ -51,8 +53,9 @@ export function DataTable<T>({
   isLoading = false,
   getRowId,
   renderActions,
+  onRowClick,
   emptyMessage = 'No data available',
-}: DataTableProps<T>) {
+}: DataTableProps<T>): React.JSX.Element {
   const handleSort = (columnId: string) => {
     onSort?.(columnId)
   }
@@ -126,7 +129,12 @@ export function DataTable<T>({
           </TableHead>
           <TableBody>
             {data.map((row, index) => (
-              <TableRow key={getRowId ? getRowId(row) : index} hover>
+              <TableRow
+                key={getRowId ? getRowId(row) : index}
+                hover
+                onClick={() => onRowClick?.(row)}
+                sx={{ cursor: onRowClick ? 'pointer' : undefined }}
+              >
                 {columns.map((col) => (
                   <TableCell key={col.id}>{col.render(row)}</TableCell>
                 ))}

@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react'
+import type React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { CircularProgress, Box } from '@mui/material'
 import { PublicRoute } from '../features/auth/components/PublicRoute'
@@ -9,13 +10,19 @@ import { VerifyEmailPage } from '../features/auth/pages/VerifyEmailPage'
 import { VerifyEmailSentPage } from '../features/auth/pages/VerifyEmailSentPage'
 import { AppLayout } from './AppLayout'
 
-// Lazy-loaded feature modules for code splitting
+// Each feature module is lazy-loaded so its code only loads when the user visits that route
 const DashboardPage = lazy(() => import('../features/dashboard/pages/DashboardPage'))
 const ClientsPage = lazy(() => import('../features/clients/pages/ClientsPage'))
 const VehiclesPage = lazy(() => import('../features/vehicles/pages/VehiclesPage'))
 const MechanicsPage = lazy(() => import('../features/mechanics/pages/MechanicsPage'))
 const SparePartsPage = lazy(() => import('../features/spare-parts/pages/SparePartsPage'))
+const ClientDetailPage = lazy(() => import('../features/clients/pages/ClientDetailPage'))
+const VehicleDetailPage = lazy(() => import('../features/vehicles/pages/VehicleDetailPage'))
+const MechanicDetailPage = lazy(() => import('../features/mechanics/pages/MechanicDetailPage'))
+const SparePartDetailPage = lazy(() => import('../features/spare-parts/pages/SparePartDetailPage'))
 const WorkOrdersPage = lazy(() => import('../features/work-orders/pages/WorkOrdersPage'))
+const InvoicesPage = lazy(() => import('../features/invoices/pages/InvoicesPage'))
+const InvoiceDetailPage = lazy(() => import('../features/invoices/pages/InvoiceDetailPage'))
 
 function LoadingFallback() {
   return (
@@ -25,7 +32,7 @@ function LoadingFallback() {
   )
 }
 
-export function AppRouter() {
+export function AppRouter(): React.JSX.Element {
   return (
     <Routes>
       {/* Public auth routes — no layout */}
@@ -65,10 +72,26 @@ export function AppRouter() {
           }
         />
         <Route
+          path="/clients/:id"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <ClientDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
           path="/vehicles"
           element={
             <Suspense fallback={<LoadingFallback />}>
               <VehiclesPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/vehicles/:id"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <VehicleDetailPage />
             </Suspense>
           }
         />
@@ -81,6 +104,14 @@ export function AppRouter() {
           }
         />
         <Route
+          path="/mechanics/:id"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <MechanicDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
           path="/inventory"
           element={
             <Suspense fallback={<LoadingFallback />}>
@@ -89,10 +120,34 @@ export function AppRouter() {
           }
         />
         <Route
+          path="/inventory/:id"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <SparePartDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
           path="/work-orders"
           element={
             <Suspense fallback={<LoadingFallback />}>
               <WorkOrdersPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/invoices"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <InvoicesPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/invoices/:id"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <InvoiceDetailPage />
             </Suspense>
           }
         />
