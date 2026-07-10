@@ -1,9 +1,14 @@
 import { api } from '../../lib/http/api'
 import type { PaginatedResponse } from '../../shared/types/api'
-import type { ChecklistTemplate, ListTemplatesParams } from './types'
+import type {
+  ChecklistTemplate,
+  ChecklistExecution,
+  ListTemplatesParams,
+} from './types'
 
 export const checklistsApi = api.injectEndpoints({
   endpoints: (builder) => ({
+    // ── Templates ──
     listChecklistTemplates: builder.query<
       PaginatedResponse<ChecklistTemplate>,
       ListTemplatesParams
@@ -55,6 +60,73 @@ export const checklistsApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Checklist'],
     }),
+
+    // ── Executions ──
+    getWorkOrderChecklists: builder.query<ChecklistExecution[], string>({
+      query: (workOrderId) => ({
+        url: `/work-orders/${workOrderId}/checklists`,
+      }),
+      providesTags: (_result, _error, workOrderId) => [
+        { type: 'ChecklistExecution' as const, workOrderId },
+        'ChecklistExecution',
+      ],
+    }),
+
+    getChecklistExecution: builder.query<ChecklistExecution, string>({
+      query: (id) => ({ url: `/checklist-executions/${id}` }),
+      providesTags: (_result, _error, id) =>
+        _result
+          ? [{ type: 'ChecklistExecution' as const, id }]
+          : ['ChecklistExecution'],
+    }),
+
+    assignChecklist: builder.mutation<
+      ChecklistExecution,
+      { workOrderId: string; templateId: string; mechanicId: string }
+    >({
+      query: ({ workOrderId, templateId, mechanicId }) => ({
+        url: `/work-orders/${workOrderId}/checklists`,
+        method: 'POST',
+        body: { templateId, mechanicId },
+      }),
+      invalidatesTags: ['ChecklistExecution'],
+    }),
+
+    startExecution: builder.mutation<ChecklistExecution, string>({
+      query: (id) => ({
+        url: `/checklist-executions/${id}/start`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: (_result, _error, id) => [
+        { type: 'ChecklistExecution' as const, id },
+        'ChecklistExecution',
+      ],
+    }),
+
+    submitAnswer: builder.mutation<
+      void,
+      { executionId: string; questionId: string; answer: string | number | boolean }
+    >({
+      query: ({ executionId, questionId, answer }) => ({
+        url: `/checklist-executions/${executionId}/answers`,
+        method: 'POST',
+        body: { questionId, answer },
+      }),
+      invalidatesTags: (_result, _error, { executionId }) => [
+        { type: 'ChecklistExecution' as const, executionId },
+      ],
+    }),
+
+    completeExecution: builder.mutation<ChecklistExecution, string>({
+      query: (id) => ({
+        url: `/checklist-executions/${id}/complete`,
+        method: 'POST',
+      }),
+      invalidatesTags: (_result, _error, id) => [
+        { type: 'ChecklistExecution' as const, id },
+        'ChecklistExecution',
+      ],
+    }),
   }),
 })
 
@@ -64,4 +136,10 @@ export const {
   useCreateChecklistTemplateMutation,
   useUpdateChecklistTemplateMutation,
   useDeleteChecklistTemplateMutation,
+  useGetWorkOrderChecklistsQuery,
+  useGetChecklistExecutionQuery,
+  useAssignChecklistMutation,
+  useStartExecutionMutation,
+  useSubmitAnswerMutation,
+  useCompleteExecutionMutation,
 } = checklistsApi
