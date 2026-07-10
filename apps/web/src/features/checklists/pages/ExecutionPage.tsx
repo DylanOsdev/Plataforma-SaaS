@@ -46,7 +46,7 @@ export default function ExecutionPage(): React.JSX.Element {
     passed: boolean
     completedAt: string
   } | null>(null)
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const answers = useMemo(
     () => localAnswers ?? (execution?.answers as AnswerMap | undefined) ?? {},
