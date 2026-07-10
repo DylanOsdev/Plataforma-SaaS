@@ -442,6 +442,16 @@ enum PaymentMethod {
   card
 }
 
+enum CreditNoteType {
+  credit
+  debit
+}
+
+enum CreditNoteStatus {
+  active
+  cancelled
+}
+
 model Invoice {
   id            String         @id @default(uuid()) @db.Uuid
   tenantId      String         @map("tenant_id") @db.Uuid
@@ -465,6 +475,7 @@ model Invoice {
   workOrder       WorkOrder      @relation(fields: [workOrderId], references: [id])
   client          Client         @relation(fields: [clientId], references: [id])
   payments        Payment[]
+  creditNotes     CreditNote[]
   cancelledByUser User?          @relation("CancelledInvoices", fields: [cancelledBy], references: [id])
 
   @@index([tenantId, status])
@@ -491,4 +502,27 @@ model Payment {
   @@index([tenantId, invoiceId])
   @@index([tenantId, paymentDate])
   @@map("payments")
+}
+
+model CreditNote {
+  id         String           @id @default(uuid()) @db.Uuid
+  tenantId   String           @map("tenant_id") @db.Uuid
+  invoiceId  String           @map("invoice_id") @db.Uuid
+  type       CreditNoteType
+  amount     Decimal          @db.Decimal(10, 2)
+  reason     String           @db.Text
+  status     CreditNoteStatus @default(active)
+  number     String           @db.VarChar(20)
+  issueDate  DateTime         @default(now()) @map("issue_date")
+  cancelledAt DateTime?       @map("cancelled_at")
+  cancelledBy String?         @map("cancelled_by") @db.Uuid
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@index([tenantId, invoiceId])
+  @@index([tenantId, type])
+  @@unique([tenantId, number])
+  @@map("credit_notes")
 }
