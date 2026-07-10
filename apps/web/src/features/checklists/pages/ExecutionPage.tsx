@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import type React from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
@@ -37,7 +37,8 @@ export default function ExecutionPage(): React.JSX.Element {
   const [completeExecution, { isLoading: isCompleting }] =
     useCompleteExecutionMutation()
 
-  const [answers, setAnswers] = useState<AnswerMap>({})
+  // Local answer overrides — when null, falls back to execution.answers
+  const [localAnswers, setLocalAnswers] = useState<AnswerMap | null>(null)
   const [showSummary, setShowSummary] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
   const [completedResult, setCompletedResult] = useState<{
@@ -47,18 +48,16 @@ export default function ExecutionPage(): React.JSX.Element {
   } | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>()
 
-  // Initialise answers from execution data
-  useEffect(() => {
-    if (execution?.answers) {
-      setAnswers(execution.answers)
-    }
-  }, [execution?.answers])
+  const answers = useMemo(
+    () => localAnswers ?? (execution?.answers as AnswerMap | undefined) ?? {},
+    [localAnswers, execution?.answers],
+  )
 
   const isCompleted = execution?.status === 'completed'
 
   const handleAnswerChange = useCallback(
     (questionId: string, value: string | number | boolean) => {
-      setAnswers((prev) => ({ ...prev, [questionId]: value }))
+      setLocalAnswers((prev) => ({ ...prev, [questionId]: value }))
       setValidationError(null)
 
       if (debounceRef.current) {
