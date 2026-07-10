@@ -13,8 +13,11 @@ import { Response } from 'express';
 import { InvoicesService } from './invoices.service';
 import { InvoicePdfService } from './invoice-pdf.service';
 import { PaymentsService } from './payments.service';
+import { CreditNotesService } from './credit-notes.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { CreateCreditNoteDto } from './dto/create-credit-note.dto';
+import { QueryCreditNoteDto } from './dto/query-credit-note.dto';
 import { QueryInvoiceDto } from './dto/query-invoice.dto';
 import { ReportSummaryDto } from './dto/report-summary.dto';
 import { TenantContextInterceptor } from '../../common/tenant/tenant-context.interceptor';
@@ -35,6 +38,7 @@ export class InvoicesController {
     private readonly invoicesService: InvoicesService,
     private readonly invoicePdfService: InvoicePdfService,
     private readonly paymentsService: PaymentsService,
+    private readonly creditNotesService: CreditNotesService,
     private readonly tenantContext: TenantContext,
   ) {}
 
@@ -128,6 +132,47 @@ export class InvoicesController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<any> {
     return this.invoicesService.cancelInvoice(
+      this.tenantContext.tenantId,
+      id,
+      user.id,
+    );
+  }
+
+  @Roles('admin_taller', 'recepcionista', 'mecanico')
+  @Get('invoices/:id/credit-notes')
+  findCreditNotes(
+    @Param('id') id: string,
+    @Query() query: QueryCreditNoteDto,
+  ): Promise<any> {
+    return this.creditNotesService.findByInvoice(
+      this.tenantContext.tenantId,
+      id,
+      query,
+    );
+  }
+
+  @Roles('admin_taller', 'recepcionista')
+  @Post('invoices/:id/credit-notes')
+  createCreditNote(
+    @Param('id') id: string,
+    @Body() dto: CreateCreditNoteDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<any> {
+    return this.creditNotesService.create(
+      this.tenantContext.tenantId,
+      id,
+      dto,
+      user.id,
+    );
+  }
+
+  @Roles('admin_taller', 'recepcionista')
+  @Post('credit-notes/:id/cancel')
+  cancelCreditNote(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<any> {
+    return this.creditNotesService.cancel(
       this.tenantContext.tenantId,
       id,
       user.id,

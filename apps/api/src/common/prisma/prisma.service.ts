@@ -26,6 +26,7 @@ export const TENANT_SCOPED_MODELS = [
   'ChecklistAnswer',
   'Invoice',
   'Payment',
+  'CreditNote',
 ] as const;
 export type TenantScopedModel = (typeof TENANT_SCOPED_MODELS)[number];
 
