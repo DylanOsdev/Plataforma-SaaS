@@ -168,6 +168,60 @@ export class InvoicesService {
     });
   }
 
+  async findOneForPdf(tenantId: string, id: string): Promise<any> {
+    return this.prisma.withRlsTransaction(async (tx) => {
+      const invoice = await tx.invoice.findFirst({
+        where: { id, tenantId },
+        include: {
+          client: {
+            select: {
+              name: true,
+              email: true,
+              phone: true,
+              address: true,
+            },
+          },
+          workOrder: {
+            include: {
+              vehicle: {
+                select: {
+                  make: true,
+                  model: true,
+                  year: true,
+                  plate: true,
+                },
+              },
+              mechanics: {
+                include: {
+                  mechanic: {
+                    select: { name: true },
+                  },
+                },
+              },
+              spareParts: {
+                include: {
+                  sparePart: {
+                    select: { name: true, code: true },
+                  },
+                },
+              },
+              cost: true,
+            },
+          },
+          payments: {
+            orderBy: { paymentDate: 'desc' },
+          },
+        },
+      });
+
+      if (!invoice) {
+        throw new NotFoundException('Invoice not found');
+      }
+
+      return invoice;
+    });
+  }
+
   async cancelInvoice(tenantId: string, id: string, userId: string) {
     return this.prisma.withRlsTransaction(async (tx) => {
       // 1. Fetch invoice

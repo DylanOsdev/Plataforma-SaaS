@@ -5,9 +5,13 @@ import {
   Param,
   Body,
   Query,
+  Res,
+  StreamableFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { InvoicesService } from './invoices.service';
+import { InvoicePdfService } from './invoice-pdf.service';
 import { PaymentsService } from './payments.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -29,6 +33,7 @@ interface AuthenticatedUser {
 export class InvoicesController {
   constructor(
     private readonly invoicesService: InvoicesService,
+    private readonly invoicePdfService: InvoicePdfService,
     private readonly paymentsService: PaymentsService,
     private readonly tenantContext: TenantContext,
   ) {}
@@ -38,7 +43,7 @@ export class InvoicesController {
   createInvoice(
     @Param('id') workOrderId: string,
     @Body() dto: CreateInvoiceDto,
-  ) {
+  ): Promise<any> {
     return this.invoicesService.createInvoice(
       this.tenantContext.tenantId,
       workOrderId,
@@ -51,7 +56,7 @@ export class InvoicesController {
   findAll(
     @Query() query: QueryInvoiceDto,
     @CurrentUser() user: AuthenticatedUser,
-  ) {
+  ): Promise<any> {
     return this.invoicesService.findAll(
       this.tenantContext.tenantId,
       query,
@@ -62,7 +67,7 @@ export class InvoicesController {
 
   @Roles('admin_taller', 'recepcionista')
   @Get('invoices/reports/summary')
-  getReportSummary(@Query() query: ReportSummaryDto) {
+  getReportSummary(@Query() query: ReportSummaryDto): Promise<any> {
     return this.invoicesService.getReportSummary(
       this.tenantContext.tenantId,
       query.dateFrom ? new Date(query.dateFrom) : undefined,
@@ -72,8 +77,33 @@ export class InvoicesController {
 
   @Roles('admin_taller', 'recepcionista', 'mecanico')
   @Get('invoices/:id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<any> {
     return this.invoicesService.findOne(this.tenantContext.tenantId, id);
+  }
+
+  @Roles('admin_taller', 'recepcionista', 'mecanico')
+  @Get('invoices/:id/pdf')
+  async downloadPdf(
+    @Param('id') id: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    const pdfBuffer = await this.invoicePdfService.generatePdf(
+      this.tenantContext.tenantId,
+      id,
+    );
+
+    const invoice = await this.invoicesService.findOne(
+      this.tenantContext.tenantId,
+      id,
+    );
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `inline; filename="${invoice.invoiceNumber}.pdf"`,
+      'Content-Length': pdfBuffer.length.toString(),
+    });
+
+    return new StreamableFile(pdfBuffer);
   }
 
   @Roles('admin_taller', 'recepcionista')
@@ -82,7 +112,7 @@ export class InvoicesController {
     @Param('id') id: string,
     @Body() dto: CreatePaymentDto,
     @CurrentUser() user: AuthenticatedUser,
-  ) {
+  ): Promise<any> {
     return this.paymentsService.registerPayment(
       this.tenantContext.tenantId,
       id,
@@ -96,7 +126,7 @@ export class InvoicesController {
   cancelInvoice(
     @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
-  ) {
+  ): Promise<any> {
     return this.invoicesService.cancelInvoice(
       this.tenantContext.tenantId,
       id,
