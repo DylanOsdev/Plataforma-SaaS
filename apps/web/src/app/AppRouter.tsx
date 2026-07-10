@@ -21,6 +21,8 @@ const VehicleDetailPage = lazy(() => import('../features/vehicles/pages/VehicleD
 const MechanicDetailPage = lazy(() => import('../features/mechanics/pages/MechanicDetailPage'))
 const SparePartDetailPage = lazy(() => import('../features/spare-parts/pages/SparePartDetailPage'))
 const WorkOrdersPage = lazy(() => import('../features/work-orders/pages/WorkOrdersPage'))
+const InvoicesPage = lazy(() => import('../features/invoices/pages/InvoicesPage'))
+const InvoiceDetailPage = lazy(() => import('../features/invoices/pages/InvoiceDetailPage'))
 
 function LoadingFallback() {
   return (
@@ -130,6 +132,22 @@ export function AppRouter(): React.JSX.Element {
           element={
             <Suspense fallback={<LoadingFallback />}>
               <WorkOrdersPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/invoices"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <InvoicesPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/invoices/:id"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <InvoiceDetailPage />
             </Suspense>
           }
         />

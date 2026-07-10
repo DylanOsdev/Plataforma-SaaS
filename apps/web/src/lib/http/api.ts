@@ -10,6 +10,6 @@ import { httpClientBaseQuery } from './baseQuery'
  */
 export const api = createApi({
   baseQuery: httpClientBaseQuery,
-  tagTypes: ['Client', 'Vehicle', 'Mechanic', 'SparePart', 'WorkOrder'],
+  tagTypes: ['Client', 'Vehicle', 'Mechanic', 'SparePart', 'WorkOrder', 'Invoice'],
   endpoints: () => ({}),
 })
