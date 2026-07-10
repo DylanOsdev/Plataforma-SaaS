@@ -23,7 +23,12 @@ import { ReportsModule } from './modules/reports/reports.module';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{ ttl: 60000, limit: 5 }]),
+    ThrottlerModule.forRootAsync({
+      useFactory: () => {
+        const limit = parseInt(process.env.THROTTLER_LIMIT ?? '5', 10);
+        return [{ ttl: 60000, limit: isNaN(limit) ? 5 : limit }];
+      },
+    }),
     EventEmitterModule.forRoot(),
     TenantContextModule,
     PrismaModule,

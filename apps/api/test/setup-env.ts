@@ -23,3 +23,7 @@ if (existsSync(envPath)) {
     }
   }
 }
+
+// Set a high throttle limit so E2E suites don't 429 each other by default.
+// Individual tests that verify throttling behavior can override this.
+process.env.THROTTLER_LIMIT = process.env.THROTTLER_LIMIT || '10000';
