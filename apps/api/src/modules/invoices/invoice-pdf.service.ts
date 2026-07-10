@@ -113,7 +113,9 @@ export class InvoicePdfService {
       }
 
       doc.fontSize(22).font('NotoSans').text('Taller SAAS', { align: 'left' });
-      doc.fontSize(10).fillColor('#666666')
+      doc
+        .fontSize(10)
+        .fillColor('#666666')
         .text('Invoice', { align: 'right' })
         .fillColor('#000000');
 
@@ -127,11 +129,7 @@ export class InvoicePdfService {
       doc.text(`Status: ${invoice.status.toUpperCase()}`, { align: 'left' });
       doc.moveDown(1);
 
-      doc
-        .moveTo(50, doc.y)
-        .lineTo(545, doc.y)
-        .strokeColor('#cccccc')
-        .stroke();
+      doc.moveTo(50, doc.y).lineTo(545, doc.y).strokeColor('#cccccc').stroke();
       doc.moveDown(0.5);
 
       if (invoice.client) {
@@ -210,10 +208,7 @@ export class InvoicePdfService {
       }
 
       if (invoice.payments && invoice.payments.length > 0) {
-        doc
-          .fontSize(14)
-          .font('NotoSans')
-          .text('Payments', { underline: true });
+        doc.fontSize(14).font('NotoSans').text('Payments', { underline: true });
         doc.moveDown(0.3);
         this.drawTable(
           doc,
@@ -237,9 +232,12 @@ export class InvoicePdfService {
       const paidAmount = Number(invoice.paidAmount);
 
       doc.text(`Subtotal: $${subtotal.toFixed(2)}`, { align: 'right' });
-      doc.text(`Tax (${Number(invoice.taxRate) * 100}%): $${taxAmount.toFixed(2)}`, {
-        align: 'right',
-      });
+      doc.text(
+        `Tax (${Number(invoice.taxRate) * 100}%): $${taxAmount.toFixed(2)}`,
+        {
+          align: 'right',
+        },
+      );
       doc
         .fontSize(14)
         .font('NotoSans')
@@ -321,7 +319,14 @@ export class InvoicePdfService {
     doc.fontSize(9).font('NotoSans').fillColor('#ffffff');
     let x = startX;
     doc.save();
-    doc.rect(startX, currentY, columnWidths.reduce((a, b) => a + b, 0), rowHeight).fill('#333333');
+    doc
+      .rect(
+        startX,
+        currentY,
+        columnWidths.reduce((a, b) => a + b, 0),
+        rowHeight,
+      )
+      .fill('#333333');
     doc.fillColor('#ffffff');
     for (let i = 0; i < headers.length; i++) {
       doc.text(headers[i], x + 3, currentY + 4, {
@@ -339,7 +344,12 @@ export class InvoicePdfService {
       const rowIndex = rows.indexOf(row);
       if (rowIndex % 2 === 1) {
         doc
-          .rect(startX, currentY, columnWidths.reduce((a, b) => a + b, 0), rowHeight)
+          .rect(
+            startX,
+            currentY,
+            columnWidths.reduce((a, b) => a + b, 0),
+            rowHeight,
+          )
           .fillColor('#f5f5f5')
           .fill()
           .fillColor('#333333');

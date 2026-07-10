@@ -162,18 +162,31 @@ describe('Invoice PDF Generation (e2e)', () => {
       data: {
         workOrderId: workOrder.id,
         laborCost: new Decimal(100),
-        partsCost: overrides?.addParts !== false ? new Decimal(51) : new Decimal(0),
-        subtotal: overrides?.addParts !== false ? new Decimal(151) : new Decimal(100),
+        partsCost:
+          overrides?.addParts !== false ? new Decimal(51) : new Decimal(0),
+        subtotal:
+          overrides?.addParts !== false ? new Decimal(151) : new Decimal(100),
         taxRate: new Decimal(0.21),
-        taxAmount: overrides?.addParts !== false ? new Decimal(31.71) : new Decimal(21),
-        total: overrides?.addParts !== false ? new Decimal(182.71) : new Decimal(121),
+        taxAmount:
+          overrides?.addParts !== false ? new Decimal(31.71) : new Decimal(21),
+        total:
+          overrides?.addParts !== false
+            ? new Decimal(182.71)
+            : new Decimal(121),
         calculatedAt: new Date(),
       },
     });
 
     const status = overrides?.status ?? 'pending';
     const totalAmount = overrides?.addParts !== false ? 182.71 : 121;
-    const paidAmount = status === 'partial' ? 100 : status === 'paid' ? totalAmount : status === 'overpaid' ? 200 : 0;
+    const paidAmount =
+      status === 'partial'
+        ? 100
+        : status === 'paid'
+          ? totalAmount
+          : status === 'overpaid'
+            ? 200
+            : 0;
 
     const invoice = await seedInvoice(seedPrisma, {
       tenantId,
@@ -199,7 +212,16 @@ describe('Invoice PDF Generation (e2e)', () => {
       });
     }
 
-    return { accessToken, tenantId, userId, client, vehicle, workOrder, mechanic, invoice };
+    return {
+      accessToken,
+      tenantId,
+      userId,
+      client,
+      vehicle,
+      workOrder,
+      mechanic,
+      invoice,
+    };
   }
 
   // ====================
