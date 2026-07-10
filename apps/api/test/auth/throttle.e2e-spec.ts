@@ -12,6 +12,8 @@ describe('Throttler (integration)', () => {
 
   beforeAll(async () => {
     process.env.DATABASE_URL = process.env.DATABASE_URL_TEST;
+    // Override the default high test limit to verify actual throttling behavior
+    process.env.THROTTLER_LIMIT = '5';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
