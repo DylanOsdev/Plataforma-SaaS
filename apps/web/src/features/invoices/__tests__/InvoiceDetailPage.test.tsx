@@ -19,6 +19,9 @@ vi.mock('../invoicesApi', () => ({
   useGetInvoiceQuery: (...args: unknown[]) => mockUseGetInvoiceQuery(...args),
   useListInvoicesQuery: vi.fn(),
   useCreateInvoiceMutation: vi.fn(() => [vi.fn(), { isLoading: false }]),
+  useListCreditNotesQuery: vi.fn(() => ({ data: [], isLoading: false, isError: false, error: null })),
+  useCreateCreditNoteMutation: vi.fn(() => [vi.fn(), { isLoading: false, error: null }]),
+  useCancelCreditNoteMutation: vi.fn(() => [vi.fn(), { isLoading: false }]),
 }));
 
 import InvoiceDetailPage from '../pages/InvoiceDetailPage';

@@ -1,6 +1,6 @@
 import { api } from '../../lib/http/api';
 import type { PaginatedResponse } from '../../shared/types/api';
-import type { Invoice, ListInvoicesParams } from './types';
+import type { CreditNote, CreateCreditNoteDto, Invoice, ListInvoicesParams } from './types';
 
 export const invoicesApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -22,7 +22,36 @@ export const invoicesApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Invoice', 'WorkOrder'],
     }),
+
+    listCreditNotes: builder.query<CreditNote[], string>({
+      query: (invoiceId) => ({ url: `/invoices/${invoiceId}/credit-notes` }),
+      providesTags: (_result, _error, invoiceId) => [{ type: 'CreditNote' as const, id: invoiceId }],
+    }),
+
+    createCreditNote: builder.mutation<CreditNote, { invoiceId: string; data: CreateCreditNoteDto }>({
+      query: ({ invoiceId, data }) => ({
+        url: `/invoices/${invoiceId}/credit-notes`,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: (_result, _error, { invoiceId }) => [{ type: 'CreditNote' as const, id: invoiceId }],
+    }),
+
+    cancelCreditNote: builder.mutation<CreditNote, string>({
+      query: (id) => ({
+        url: `/credit-notes/${id}/cancel`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['CreditNote'],
+    }),
   }),
 });
 
-export const { useListInvoicesQuery, useGetInvoiceQuery, useCreateInvoiceMutation } = invoicesApi;
+export const {
+  useListInvoicesQuery,
+  useGetInvoiceQuery,
+  useCreateInvoiceMutation,
+  useListCreditNotesQuery,
+  useCreateCreditNoteMutation,
+  useCancelCreditNoteMutation,
+} = invoicesApi;
