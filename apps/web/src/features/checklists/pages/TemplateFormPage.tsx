@@ -1,5 +1,5 @@
 import type React from 'react'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   Box,
@@ -33,19 +33,18 @@ export default function TemplateFormPage(): React.JSX.Element {
   const [updateTemplate, { isLoading: isUpdating }] =
     useUpdateChecklistTemplateMutation()
 
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [sections, setSections] = useState<ChecklistSection[]>([])
+  // Editable overrides — when null, fall back to template data (edit mode)
+  const [nameOverride, setNameOverride] = useState<string | null>(null)
+  const [descriptionOverride, setDescriptionOverride] = useState<string | null>(null)
+  const [sectionsOverride, setSectionsOverride] = useState<ChecklistSection[] | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // Load template data when editing
-  useEffect(() => {
-    if (template) {
-      setName(template.name)
-      setDescription(template.description ?? '')
-      setSections(template.sections)
-    }
-  }, [template])
+  const name = nameOverride ?? template?.name ?? ''
+  const description = descriptionOverride ?? template?.description ?? ''
+  const sections = useMemo(
+    () => sectionsOverride ?? (template as { sections?: ChecklistSection[] })?.sections ?? [],
+    [sectionsOverride, template],
+  )
 
   const validate = useCallback((): boolean => {
     const newErrors: Record<string, string> = {}
@@ -138,7 +137,7 @@ export default function TemplateFormPage(): React.JSX.Element {
         <TextField
           label="Template Name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => setNameOverride(e.target.value)}
           fullWidth
           required
           error={Boolean(errors.name)}
@@ -149,7 +148,7 @@ export default function TemplateFormPage(): React.JSX.Element {
         <TextField
           label="Description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => setDescriptionOverride(e.target.value)}
           fullWidth
           multiline
           minRows={2}
@@ -165,7 +164,7 @@ export default function TemplateFormPage(): React.JSX.Element {
               {errors.sections}
             </Alert>
           )}
-          <SectionBuilder sections={sections} onChange={setSections} />
+          <SectionBuilder sections={sections} onChange={setSectionsOverride} />
         </Box>
 
         <Box display="flex" gap={2}>

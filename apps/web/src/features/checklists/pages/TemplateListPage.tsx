@@ -73,7 +73,7 @@ export default function TemplateListPage() {
 
   const { data, isLoading, isError, error } =
     useListChecklistTemplatesQuery(params)
-  const [deleteTemplate, { isLoading: isDeleting }] =
+  const [deleteTemplate] =
     useDeleteChecklistTemplateMutation()
 
   const handlePageChange = useCallback((newPage: number) => {
