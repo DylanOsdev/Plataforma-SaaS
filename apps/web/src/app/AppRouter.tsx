@@ -21,6 +21,8 @@ const VehicleDetailPage = lazy(() => import('../features/vehicles/pages/VehicleD
 const MechanicDetailPage = lazy(() => import('../features/mechanics/pages/MechanicDetailPage'))
 const SparePartDetailPage = lazy(() => import('../features/spare-parts/pages/SparePartDetailPage'))
 const WorkOrdersPage = lazy(() => import('../features/work-orders/pages/WorkOrdersPage'))
+const TemplateListPage = lazy(() => import('../features/checklists/pages/TemplateListPage'))
+const TemplateFormPage = lazy(() => import('../features/checklists/pages/TemplateFormPage'))
 const InvoicesPage = lazy(() => import('../features/invoices/pages/InvoicesPage'))
 const InvoiceDetailPage = lazy(() => import('../features/invoices/pages/InvoiceDetailPage'))
 
@@ -132,6 +134,30 @@ export function AppRouter(): React.JSX.Element {
           element={
             <Suspense fallback={<LoadingFallback />}>
               <WorkOrdersPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/checklist-templates"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <TemplateListPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/checklist-templates/new"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <TemplateFormPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/checklist-templates/:id/edit"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <TemplateFormPage />
             </Suspense>
           }
         />
