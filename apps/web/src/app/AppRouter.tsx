@@ -25,6 +25,8 @@ const TemplateListPage = lazy(() => import('../features/checklists/pages/Templat
 const TemplateFormPage = lazy(() => import('../features/checklists/pages/TemplateFormPage'))
 const InvoicesPage = lazy(() => import('../features/invoices/pages/InvoicesPage'))
 const InvoiceDetailPage = lazy(() => import('../features/invoices/pages/InvoiceDetailPage'))
+const WorkOrderDetailPage = lazy(() => import('../features/checklists/pages/WorkOrderDetailPage'))
+const ExecutionPage = lazy(() => import('../features/checklists/pages/ExecutionPage'))
 
 function LoadingFallback() {
   return (
@@ -134,6 +136,22 @@ export function AppRouter(): React.JSX.Element {
           element={
             <Suspense fallback={<LoadingFallback />}>
               <WorkOrdersPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/work-orders/:id"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <WorkOrderDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/work-orders/:id/checklists/:executionId"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <ExecutionPage />
             </Suspense>
           }
         />

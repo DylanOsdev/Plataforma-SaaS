@@ -230,6 +230,7 @@ export default function WorkOrdersPage({ initialParams }: WorkOrdersPageProps) {
         isLoading={isLoading}
         emptyMessage="No work orders yet"
         getRowId={(row) => row.id}
+        onRowClick={(row) => navigate(`/work-orders/${row.id}`)}
         renderActions={(row) => {
           if (row.milestone !== 'completed') return null;
           return (
