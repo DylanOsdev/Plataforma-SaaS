@@ -87,23 +87,28 @@ export class InvoicesController {
     @Param('id') id: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
-    const pdfBuffer = await this.invoicePdfService.generatePdf(
-      this.tenantContext.tenantId,
-      id,
-    );
+    try {
+      const pdfBuffer = await this.invoicePdfService.generatePdf(
+        this.tenantContext.tenantId,
+        id,
+      );
 
-    const invoice = await this.invoicesService.findOne(
-      this.tenantContext.tenantId,
-      id,
-    );
+      const invoice = await this.invoicesService.findOne(
+        this.tenantContext.tenantId,
+        id,
+      );
 
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `inline; filename="${invoice.invoiceNumber}.pdf"`,
-      'Content-Length': pdfBuffer.length.toString(),
-    });
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `inline; filename="${invoice.invoiceNumber}.pdf"`,
+        'Content-Length': pdfBuffer.length.toString(),
+      });
 
-    return new StreamableFile(pdfBuffer);
+      return new StreamableFile(pdfBuffer);
+    } catch (err) {
+      console.error('[PDF ERROR]', err);
+      throw err;
+    }
   }
 
   @Roles('admin_taller', 'recepcionista')
